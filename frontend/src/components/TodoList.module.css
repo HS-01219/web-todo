@@ -148,7 +148,7 @@
 /* 완료된 일 목록 스타일 수정 */
 .completedTask {
   background-color: #f5f5f5; /* 배경 색을 연한 회색으로 변경 */
-  opacity: 0.8; /* 텍스트의 불투명도를 줄여서 완료된 느낌을 주기 */
+  opacity: 0.73; /* 텍스트의 불투명도를 줄여서 완료된 느낌을 주기 */
 }
 
 .completedTask .taskName {
