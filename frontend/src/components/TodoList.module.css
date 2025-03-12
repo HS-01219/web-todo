@@ -1,0 +1,163 @@
+/* TodoList.module.css */
+
+/* 전체 컨테이너 */
+.container {
+  display: flex;
+  justify-content: flex-start; /* 왼쪽 정렬 */
+  padding: 20px;
+  align-items: flex-start; /* 항목들이 상단에 정렬되도록 설정 */
+}
+
+/* 왼쪽: 팀 목록 */
+.teamList {
+  max-width:300px ;
+  width: 30%;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.teamList h3 {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+}
+
+.teamList ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.teamItem {
+  margin :4px;
+  padding: 7px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+
+.teamItem:hover {
+  background-color: #f0f0f0;
+}
+
+.selectedTeam {
+  background-color: #ec7393;
+  color: white;
+}
+
+/* 오른쪽: 할 일 목록 */
+.todoList {
+  text-align: left;
+  max-width: 900px;
+  width: 100%;
+  padding: 10px;
+}
+
+.todoList h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.inputWrapper {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.inputTask {
+  width: 80%;
+  height: 17px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.addButton {
+  padding: 10px;
+  height: 38px;
+  margin-left: 10px;
+  background-color: #ec7393;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.addButton:hover {
+  background-color: #d66b8a;
+}
+
+/* 할 일 목록 */
+.taskList {
+  list-style-type: none;
+  padding: 0;
+}
+
+.taskItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.checkbox {
+  margin-right: 10px;
+}
+
+.taskName {
+  flex-grow: 1;
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.editInput {
+  margin-right : 10px;
+  width: 70%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.button {
+  padding: 5px 10px;
+  background-color: #ec7393;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #d66b8a;
+}
+
+.deleteButton {
+  background-color: #301a1a;
+}
+
+.deleteButton:hover {
+  background-color: #d32f2f;
+}
+
+/* 완료된 일 목록 */
+.doneTaskList {
+  list-style-type: none;
+  padding: 0;
+}
+
+/* 완료된 일 목록 스타일 수정 */
+.completedTask {
+  background-color: #f5f5f5; /* 배경 색을 연한 회색으로 변경 */
+  opacity: 0.8; /* 텍스트의 불투명도를 줄여서 완료된 느낌을 주기 */
+}
+
+.completedTask .taskName {
+  text-decoration: none; /* 밑줄 제거 */
+}
+
+
+/* 수정 및 삭제 버튼 사이에 간격 추가 */
+.button + .button {
+  margin-left: 3px; /* 수정 버튼과 삭제 버튼 사이에 간격 추가 */
+}
+

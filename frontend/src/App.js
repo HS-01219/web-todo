@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Login from './components/Login';
+import Login from './components/AuthForm';
 import TodoList from './components/TodoList';
 
 const App = () => {
