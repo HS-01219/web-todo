@@ -4,19 +4,16 @@ var router = express.Router();
 const { 
     createWork, 
     getWorks, 
-    updateWorkStatus, 
-    updateWorkName, 
+    updateWork,
     deleteWork 
 } = require("../controller/workController");
 
 router.route('/')
     .get(getWorks)
     .post(createWork)
-    .put(updateWorkStatus);
+    .put(updateWork);
 
-router.route('/:id')
-    .delete(deleteWork)
-    .put(updateWorkName);
+router.delete('/:id', deleteWork);
 
 module.exports = router;
 
