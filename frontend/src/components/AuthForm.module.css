@@ -1,0 +1,71 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f9f9f9;
+}
+
+.authBox {
+  width: 320px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.title {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.input {
+  width: 93%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.errorInput {
+  border: 1px solid red; /* 에러 발생 시 빨간 테두리 */
+  background-color: #ffe6e6; /* 연한 빨간색 배경 */
+}
+
+.errorMessage {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.button {
+  width: 100%;
+  padding: 10px;
+  background-color: #ec7393;
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #d62a61;
+}
+
+.toggleText {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+}
+
+.toggleButton {
+  color: #ec7393;
+  font-weight: bold;
+  cursor: pointer;
+}
