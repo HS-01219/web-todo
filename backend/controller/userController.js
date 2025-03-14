@@ -1,60 +1,56 @@
-const conn = require("../db/mariadb");
 const { StatusCodes } = require("http-status-codes");
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const userService = require("../service/userService");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const join = (req, res) => {
+const join = async (req, res) => {
     const {loginId, pwd} = req.body;
 
+    // 유효성 검사 추가 후 삭제
     if(!loginId || !pwd) {
         return res.status(StatusCodes.BAD_REQUEST).end();
     }
-
-    // 이미 가입한 이메일인지 체크 필요
-
-    const salt = crypto.randomBytes(10).toString('base64');
-    const hashPassword = crypto.pbkdf2Sync(pwd, salt, 10000, 10, 'sha512').toString('base64');
-
-    const sql = `INSERT INTO users (login_id, password, salt) VALUES (?, ?, ?)`;
-    const values = [loginId, hashPassword, salt];
-    conn.query(
-        sql, values, function(err, result) {
-            if(err) {
-                console.log(err)
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
-            }
-            console.log("return")
-            return res.status(StatusCodes.CREATED).json(result);
+    
+    try {
+        const loginUser = await userService.findUserByLoginId(loginId);
+        if(loginUser.length > 0) {
+            return res.status(StatusCodes.CONFLICT).end();
         }
-    );
+
+        const result = await userService.joinUser(loginId, pwd);
+        return res.status(StatusCodes.CREATED).json(result);
+    } catch(err) {
+        console.log(err)
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+    }
 }
 
-const login = (req, res) => {
+const login = async (req, res) => {
     const {loginId, pwd} = req.body;
-    const sql = `SELECT * FROM users WHERE login_id = ?`;
-    conn.query(
-        sql, loginId, function(err, result) {
-            if(err) {
-                console.log(err)
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
-            }
 
-            const loginUser = result[0];
-            const hashPassword = crypto.pbkdf2Sync(pwd, loginUser.salt, 10000, 10, 'sha512').toString('base64'); 
+    try {
+        const loginUser = await userService.findUserByLoginId(loginId);
 
-            if(loginUser && loginUser.password == hashPassword) {
-                const token = jwt.sign({ loginId : loginUser.login_id }, process.env.PRIVATE_KEY, { expiresIn : '1h', issuer : "hs" });
-                res.cookie("token", token, { httpOnly : true, secure : true });
-                console.log(token);
-                
-                return res.status(StatusCodes.OK).json(result);
-            } else {
-                return res.status(StatusCodes.UNAUTHORIZED).end();
-            }
+        if (!loginUser[0]) {
+            return res.status(StatusCodes.UNAUTHORIZED).end();
         }
-    );
+
+        const hashPassword = crypto.pbkdf2Sync(pwd, loginUser[0].salt, 10000, 10, 'sha512').toString('base64');
+        if (loginUser[0].password === hashPassword) {
+            // token 관련은 추후 업데이트
+            // const token = jwt.sign({ loginId: loginUser.login_id }, process.env.PRIVATE_KEY, { expiresIn: '1h', issuer: "hs" });
+            // res.cookie("token", token, { httpOnly: true, secure: true });
+            // console.log(token);
+            return res.status(StatusCodes.OK).json(loginUser[0]);
+        } else {
+            return res.status(StatusCodes.UNAUTHORIZED).end();
+        }
+    } catch (err) {
+        console.log(err);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+    }
 }
 
 

@@ -1,51 +1,44 @@
-const conn = require("../db/mariadb");
 const { StatusCodes } = require("http-status-codes");
+const teamService = require("../service/teamService");
+const memberService = require("../service/memberService");
 
-const createTeam = (req, res) => {
-    // 만든 사람을 member 테이블에 insert하도록 수정필요
-    const { name } = req.body;
-    const sql = `INSERT INTO teams (name) VALUES (?)`;
-    conn.query(
-        sql, name, function(err, results) {
-            if(err) {
-                console.log(err)
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
-            }
-            return res.status(StatusCodes.CREATED).json(results);
-        }
-    );
+const createTeam = async (req, res) => {
+    
+    const { name, userId } = req.body;
+
+    try {
+        const result = await teamService.createTeam(name);
+        await memberService.inviteMember(result.insertId, userId);
+        return res.status(StatusCodes.CREATED).end();
+    } catch (err) {
+        console.log(err);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+    }
 }
 
-const getTeams = (req, res) => {
+const getTeams = async (req, res) => {
     const { userId } = req.query;
 
-    let sql = `SELECT T.id, T.name FROM teams T LEFT JOIN members M ON T.id = M.team_id WHERE M.user_id = ?`;
-    
-    conn.query(
-        sql, userId, function(err, results) {
-            if(err) {
-                console.log(err);
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
-            }
-            return res.status(StatusCodes.OK).json(results)
-        }
-    );
+    try {
+        const results = await teamService.getTeams(userId);
+        return res.status(StatusCodes.OK).json(results);
+    } catch (err) {
+        console.log(err);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+    }
 }
 
-const deleteTeam = (req, res) => {
-    // 팀 삭제할 때 해당 팀 멤버도 삭제하는 내용 추가 예정
+const deleteTeam = async (req, res) => {
     const { id } = req.params;
-    const sql = `DELETE FROM teams WHERE id = ?`;
 
-    conn.query(
-        sql, id, function(err, results) {
-            if(err) {
-                console.log(err);
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
-            }
-            return res.status(StatusCodes.OK).json(results)
-        }
-    );
+    try {
+        await memberService.deleteTeamMember(id);
+        await teamService.deleteTeam(id);
+        return res.status(StatusCodes.OK).end();
+    } catch (err) {
+        console.log(err);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+    }
 }
 
 module.exports = { 

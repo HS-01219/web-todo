@@ -1,93 +1,51 @@
-const conn = require("../db/mariadb");
 const { StatusCodes } = require("http-status-codes");
+const workService = require("../service/workService")
 
-const createWork = (req, res) => {
+const createWork = async (req, res) => {
     const { userId = null, teamId = null, name } = req.body;
-    const sql = `INSERT INTO works (name, user_id, team_id) VALUES (?, ?, ?)`;
-    const values = [name, userId, teamId];
-    conn.query(
-        sql, values, function(err, result) {
-            if(err) {
-                console.log(err)
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
-            }
-            return res.status(StatusCodes.CREATED).json(result);
-        }
-    );
+    try {
+        const result = await workService.createWork(name, userId, teamId);
+        return res.status(StatusCodes.CREATED).json(result);
+    } catch (err) {
+        console.log(err);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+    }
 }
 
-const getWorks = (req, res) => {
+const getWorks = async (req, res) => {
     const { userId, teamId, state } = req.query;
-    const values = [];
 
-    let sql = `SELECT * FROM works`;
-    if(userId) {
-        sql += ` WHERE user_id = ?`; 
-        values.push(userId);
+    try {
+        const results = await workService.getWorks(userId, teamId, state);
+        return res.status(StatusCodes.OK).json(results);
+    } catch (err) {
+        console.log(err);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
     }
-
-    if(teamId) {
-        sql += ` WHERE team_id = ?`; 
-        values.push(teamId);
-    }
-    
-    sql += ` AND state = ?`;
-    values.push(state);
-
-    conn.query(
-        sql, values, function(err, results) {
-            if(err) {
-                console.log(err);
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
-            }
-            return res.status(StatusCodes.OK).json(results)
-        }
-    );
 }
 
-const updateWork = (req,res) => {
+const updateWork = async (req,res) => {
     const { id, name, state } = req.body;
-
-    let sql = '';
-    const values = [];
-
-    if(name) {
-        sql = `UPDATE works SET name = ? WHERE id = ?`;
-        values.push(name, id);
-    } else if(state) {
-        sql = `UPDATE works SET state = ? WHERE id = ?`;
-        values.push(state, id);
+    // name과 state가 둘다 없을 경우 유효성검사
+    try {
+        const result = await workService.updateWork(id, name, state);
+        return res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+        console.log(err);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
     }
-
-    if(sql) {
-        conn.query(
-            sql, values, function(err, results) {
-                if(err) {
-                    console.log(err);
-                    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
-                }
-                return res.status(StatusCodes.OK).json(results)
-            }
-        );
-    } else {
-        return res.status(StatusCodes.BAD_REQUEST).end();
-    }
-
 }
 
-const deleteWork = (req, res) => {
+const deleteWork = async (req, res) => {
     const { id } = req.params;
-    const sql = `DELETE FROM works WHERE id = ?`;
 
-    conn.query(
-        sql, id, function(err, results) {
-            if(err) {
-                console.log(err);
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
-            }
-            return res.status(StatusCodes.OK).json(results)
-        }
-    );
+    try {
+        const result = await workService.deleteWork(id);
+        return res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+        console.log(err);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+    }
 }
 
 module.exports = { 
