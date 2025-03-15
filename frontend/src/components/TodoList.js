@@ -12,6 +12,8 @@ const TodoList = ({ user }) => {
   const [newTask, setNewTask] = useState('');
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [selectedTeam, setSelectedTeam] = useState(dummyTeams[0]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
 
   useEffect(() => {
     axios.get(`http://localhost:8080/api/todos?teamId=${selectedTeam.id}`)
@@ -91,19 +93,32 @@ const TodoList = ({ user }) => {
     }
   };
 
-  const deleteTask = (taskId) => {
-    setTasksByTeam(prev => ({
-      ...prev,
-      [selectedTeam.id]: prev[selectedTeam.id].filter(task => task.id !== taskId)
-    }));
+  const openDeleteModal = (taskId) => {
+    setTaskToDelete(taskId);
+    setIsModalOpen(true);
+  };
 
-    axios.delete(`http://localhost:8080/api/todos/${taskId}`)
-      .catch(error => console.error('Error deleting task:', error));
+  const closeDeleteModal = () => {
+    setTaskToDelete(null);
+    setIsModalOpen(false);
+  };
+
+  const deleteTask = () => {
+    if (taskToDelete) {
+      setTasksByTeam(prev => ({
+        ...prev,
+        [selectedTeam.id]: prev[selectedTeam.id].filter(task => task.id !== taskToDelete)
+      }));
+
+      axios.delete(`http://localhost:8080/api/todos/${taskToDelete}`)
+        .catch(error => console.error('Error deleting task:', error));
+    }
+
+    closeDeleteModal();
   };
 
   return (
     <div className={styles.container}>
-      {/* 왼쪽: 팀 목록 */}
       <div className={styles.teamList}>
         <h3>Team List</h3>
         <ul>
@@ -119,7 +134,6 @@ const TodoList = ({ user }) => {
         </ul>
       </div>
 
-      {/* 오른쪽: 할 일 목록 */}
       <div className={styles.todoList}>
         <h2>{selectedTeam.name}의 Todo List</h2>
         <div className={styles.inputWrapper}>
@@ -133,7 +147,6 @@ const TodoList = ({ user }) => {
           <button onClick={addTask} className={styles.addButton}>등록하기</button>
         </div>
 
-        {/* 할 일 목록 */}
         <h3>TO DO</h3>
         <ul className={styles.taskList}>
           {(tasksByTeam[selectedTeam.id] || []).filter(task => !task.status).map(task => (
@@ -161,14 +174,13 @@ const TodoList = ({ user }) => {
               ) : (
                 <>
                   <button onClick={() => startEditing(task.id)} className={styles.button}>수정</button>
-                  <button onClick={() => deleteTask(task.id)} className={`${styles.button} ${styles.deleteButton}`}>삭제</button>
+                  <button onClick={() => openDeleteModal(task.id)} className={`${styles.button} ${styles.deleteButton}`}>삭제</button>
                 </>
               )}
             </li>
           ))}
         </ul>
 
-        {/* 완료된 일 목록 */}
         <h3>DONE</h3>
         <ul className={styles.doneTaskList}>
           {(tasksByTeam[selectedTeam.id] || []).filter(task => task.status).map(task => (
@@ -180,11 +192,24 @@ const TodoList = ({ user }) => {
                 className={styles.checkbox}
               />
               <span className={styles.taskName}>{task.name}</span>
-              <button onClick={() => deleteTask(task.id)} className={`${styles.button} ${styles.deleteButton}`}>삭제</button>
+              <button onClick={() => openDeleteModal(task.id)} className={`${styles.button} ${styles.deleteButton}`}>삭제</button>
             </li>
           ))}
         </ul>
       </div>
+
+      {/* 삭제 확인 모달 */}
+      {isModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <p>정말로 이 할 일을 삭제하시겠습니까?</p>
+            <div>
+              <button onClick={deleteTask} className={`${styles.button} ${styles.deleteButton}`}>삭제</button>
+              <button onClick={closeDeleteModal} className={`${styles.button} ${styles.cancelButton}`}>취소</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
