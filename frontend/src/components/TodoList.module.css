@@ -177,12 +177,31 @@
 
 /* 모달 내용 */
 .modalContent {
+  padding: 15px; /* 세로 높이를 높이기 위해 padding을 증가 */
   background-color: white;
   padding: 20px;
   border-radius: 8px;
   width: 300px;
   text-align: center;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 팀 이름 입력 필드 스타일 */
+.modalContent input {
+  height: 33px;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  outline: none;
+  box-sizing: border-box; /* 여백 포함해서 크기 계산 */
+}
+
+.modalContent input:focus {
+  border-color: #ec7393; /* 포커스 시 핑크색 테두리 */
+  box-shadow: 0 0 5px rgba(236, 115, 147, 0.5); /* 포커스 시 그림자 추가 */
 }
 
 /* 버튼들을 오른쪽 정렬 */
@@ -192,21 +211,31 @@
   gap: 10px; /* 버튼 간격 */
 }
 
+/* 버튼 스타일 */
 .modalContent button {
-  margin: 0; /* 버튼 간격을 조정 */
-  padding: 8px 16px;
+  margin: 0;
+  padding: 10px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 
-/* 삭제 버튼 스타일 (검은색 배경) */
 .modalContent .deleteButton {
   background-color: black;
   color: white;
 }
 
+.modalContent .deleteButton:hover {
+  background-color: #333;
+}
+
 .modalContent .cancelButton {
   background-color: #f0f0f0;
   color: black;
+}
+
+.modalContent .cancelButton:hover {
+  background-color: #e0e0e0;
 }

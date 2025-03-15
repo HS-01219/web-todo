@@ -14,6 +14,8 @@ const TodoList = ({ user }) => {
   const [selectedTeam, setSelectedTeam] = useState(dummyTeams[0]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
+  const [newTeamName, setNewTeamName] = useState('');
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
 
   useEffect(() => {
     axios.get(`http://localhost:8080/api/todos?teamId=${selectedTeam.id}`)
@@ -117,6 +119,33 @@ const TodoList = ({ user }) => {
     closeDeleteModal();
   };
 
+  const openTeamModal = () => {
+    setIsTeamModalOpen(true);
+  };
+
+  const closeTeamModal = () => {
+    setIsTeamModalOpen(false);
+    setNewTeamName('');
+  };
+
+  const createNewTeam = () => {
+    if (!newTeamName.trim()) return;
+
+    const newTeam = {
+      id: Date.now(), // Assuming the backend will generate the team ID
+      name: newTeamName
+    };
+
+    // Add the new team to the list
+    dummyTeams.push(newTeam); // You should ideally fetch the teams again from your backend
+
+    setSelectedTeam(newTeam);
+    closeTeamModal();
+
+    axios.post('http://localhost:8080/api/teams', newTeam)
+      .catch(error => console.error('Error creating team:', error));
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.teamList}>
@@ -132,6 +161,7 @@ const TodoList = ({ user }) => {
             </li>
           ))}
         </ul>
+        <button onClick={openTeamModal} className={styles.addTeamButton}>팀 만들기</button>
       </div>
 
       <div className={styles.todoList}>
@@ -197,6 +227,26 @@ const TodoList = ({ user }) => {
           ))}
         </ul>
       </div>
+
+      {/* 팀 만들기 모달 */}
+      {isTeamModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <h3>새 팀 만들기</h3>
+            <input
+              type="text"
+              value={newTeamName}
+              onChange={(e) => setNewTeamName(e.target.value)}
+              placeholder="팀 이름"
+              className={styles.inputTask}
+            />
+            <div>
+              <button onClick={createNewTeam} className={`${styles.button} ${styles.addButton}`}>팀 만들기</button>
+              <button onClick={closeTeamModal} className={`${styles.button} ${styles.cancelButton}`}>취소</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 삭제 확인 모달 */}
       {isModalOpen && (
