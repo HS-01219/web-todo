@@ -18,6 +18,7 @@ const usersRouter = require('./routes/users');
 const worksRouter = require('./routes/works');
 const teamsRouter = require('./routes/teams');
 const membersRouter = require('./routes/members');
+const { StatusCodes } = require('http-status-codes');
 
 // var app = express();
 
@@ -38,9 +39,9 @@ app.use('/teams', teamsRouter);
 app.use('/members', membersRouter);
 
 // catch 404 and forward to error handler
-// app.use(function(req, res, next) {
-//   next(createError(404));
-// });
+app.use(function(req, res) {
+    res.status(StatusCodes.NOT_FOUND).end();
+});
 
 // error handler
 // app.use(function(err, req, res, next) {
