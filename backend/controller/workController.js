@@ -1,11 +1,12 @@
 const { StatusCodes } = require("http-status-codes");
-const workService = require("../service/workService")
+const workService = require("../service/workService");
 
 const createWork = async (req, res) => {
     const { userId = null, teamId = null, name } = req.body;
+
     try {
-        const result = await workService.createWork(name, userId, teamId);
-        return res.status(StatusCodes.CREATED).json(result);
+        await workService.createWork(name, userId, teamId);
+        return res.status(StatusCodes.CREATED).end();
     } catch (err) {
         console.log(err);
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
@@ -26,10 +27,13 @@ const getWorks = async (req, res) => {
 
 const updateWork = async (req,res) => {
     const { id, name, state } = req.body;
-    // name과 state가 둘다 없을 경우 유효성검사
+
     try {
         const result = await workService.updateWork(id, name, state);
-        return res.status(StatusCodes.OK).json(result);
+        if(!result.affectedRows) {
+            return res.status(StatusCodes.NO_CONTENT).end();
+        }
+        return res.status(StatusCodes.OK).end();
     } catch (err) {
         console.log(err);
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
@@ -41,7 +45,10 @@ const deleteWork = async (req, res) => {
 
     try {
         const result = await workService.deleteWork(id);
-        return res.status(StatusCodes.OK).json(result);
+        if(!result.affectedRows) {
+            return res.status(StatusCodes.NO_CONTENT).end();
+        }
+        return res.status(StatusCodes.OK).end();
     } catch (err) {
         console.log(err);
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();

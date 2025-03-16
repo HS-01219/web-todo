@@ -16,21 +16,18 @@ const createWork = async (name, userId, teamId) => {
 };
 
 const getWorks = async (userId, teamId, state) => {
-    const values = [];
-    let sql = `SELECT * FROM works`;
+    let sql = `SELECT * FROM works WHERE state = ?`;
+    const values = [state];
 
     if (userId) {
-        sql += ` WHERE user_id = ?`; 
+        sql += ` AND user_id = ?`; 
         values.push(userId);
     }
 
     if (teamId) {
-        sql += ` WHERE team_id = ?`; 
+        sql += ` AND team_id = ?`; 
         values.push(teamId);
     }
-
-    sql += ` AND state = ?`;
-    values.push(state);
 
     const connection = await pool.getConnection();
     try {
@@ -80,9 +77,25 @@ const deleteWork = async (id) => {
     }
 };
 
+const deleteTeamWorks = async (teamId) => {
+    const sql = `DELETE FROM works WHERE team_id = ?`;
+
+    const connection = await pool.getConnection();
+    try {
+        const [results] = await connection.query(sql, teamId);
+        return results;
+    } catch (error) {
+        throw error;
+    } finally {
+        connection.release();
+    }
+
+}
+
 module.exports = { 
     createWork, 
     getWorks, 
     updateWork, 
-    deleteWork 
+    deleteWork,
+    deleteTeamWorks
 };

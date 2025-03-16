@@ -1,9 +1,9 @@
 const { StatusCodes } = require("http-status-codes");
 const teamService = require("../service/teamService");
 const memberService = require("../service/memberService");
+const workService = require("../service/workService");
 
 const createTeam = async (req, res) => {
-    
     const { name, userId } = req.body;
 
     try {
@@ -32,6 +32,7 @@ const deleteTeam = async (req, res) => {
     const { id } = req.params;
 
     try {
+        await workService.deleteTeamWorks(id);
         await memberService.deleteTeamMember(id);
         await teamService.deleteTeam(id);
         return res.status(StatusCodes.OK).end();

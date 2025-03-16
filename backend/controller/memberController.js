@@ -1,18 +1,19 @@
 const { StatusCodes } = require("http-status-codes");
-const memberService = require("../service/memberService")
+const memberService = require("../service/memberService");
 
 const inviteMember = async (req, res) => {
     const { teamId, userId } = req.body;
+
     try {
-        const result = await memberService.inviteMember(teamId, userId);
-        return res.status(StatusCodes.CREATED).json(result);
+        await memberService.inviteMember(teamId, userId);
+        return res.status(StatusCodes.CREATED).end();
     } catch (err) {
         console.log(err);
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
     }
 }
 
-const getMembers = async (req, res) => {
+const getMembers = async (req, res) => { 
     const { teamId } = req.query;
 
     try {
@@ -29,7 +30,10 @@ const deleteMember = async (req, res) => {
 
     try {
         const result = await memberService.deleteMember(id);
-        return res.status(StatusCodes.OK).json(result);
+        if(!result.affectedRows) {
+            return res.status(StatusCodes.NO_CONTENT).end();
+        }
+        return res.status(StatusCodes.OK).end();
     } catch (err) {
         console.log(err);
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();

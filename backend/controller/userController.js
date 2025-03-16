@@ -7,11 +7,6 @@ dotenv.config();
 
 const join = async (req, res) => {
     const {loginId, pwd} = req.body;
-
-    // 유효성 검사 추가 후 삭제
-    if(!loginId || !pwd) {
-        return res.status(StatusCodes.BAD_REQUEST).end();
-    }
     
     try {
         const loginUser = await userService.findUserByLoginId(loginId);
@@ -19,8 +14,8 @@ const join = async (req, res) => {
             return res.status(StatusCodes.CONFLICT).end();
         }
 
-        const result = await userService.joinUser(loginId, pwd);
-        return res.status(StatusCodes.CREATED).json(result);
+        await userService.joinUser(loginId, pwd);
+        return res.status(StatusCodes.CREATED).end();
     } catch(err) {
         console.log(err)
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
