@@ -1,5 +1,7 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const { check } = require('express-validator');
+const { errorValidate } = require('../middleware/validator');
 
 const { 
     inviteMember, 
@@ -9,8 +11,11 @@ const {
 
 
 router.route('/')
-    .get(getMembers)
-    .post(inviteMember)
+    .get([check('teamId', 'teamId is Empty').notEmpty() 
+        , errorValidate], getMembers)
+    .post([check('teamId', 'teamId is Empty').notEmpty() 
+        , check('userId', 'userId is Empty').notEmpty()
+        , errorValidate], inviteMember)
 
 router.delete('/:id', deleteMember);
 

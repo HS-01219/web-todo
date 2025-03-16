@@ -1,5 +1,7 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const { check } = require('express-validator');
+const { errorValidate, validateEitherOne } = require('../middleware/validator');
 
 const { 
     createWork, 
@@ -9,9 +11,14 @@ const {
 } = require("../controller/workController");
 
 router.route('/')
-    .get(getWorks)
-    .post(createWork)
-    .put(updateWork);
+    .get([validateEitherOne(['userId', 'teamId']) 
+        , check('state', 'state is Empty').notEmpty()
+        , errorValidate], getWorks)
+    .post([validateEitherOne(['userId', 'teamId'])
+        , check('name', 'name is Empty').notEmpty()
+        , errorValidate], createWork)
+    .put([validateEitherOne(['name', 'state']) 
+        , errorValidate], updateWork);
 
 router.delete('/:id', deleteWork);
 
