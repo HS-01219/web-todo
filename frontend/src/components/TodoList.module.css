@@ -187,7 +187,7 @@
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  width: 300px;
+  width: 320px;
   text-align: center;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
@@ -306,3 +306,98 @@
 .addTeamButton:hover {
   background: #d9607f; /* 살짝 어두운 분홍 */
 }
+
+/* 모달 내 삭제 버튼 스타일 */
+.modalDeleteButton {
+  margin-left: 10px;
+  background: none; /* 배경 제거 */
+  border: none; /* 테두리 제거 */
+  color: #ff0000; /* 아이콘 색상 설정 */
+  cursor: pointer; /* 커서 변경 */
+  padding: 0; /* 아이콘 주위 여백 제거 */
+}
+
+.modalDeleteButton svg {
+  width: 16px; /* 아이콘 크기 조정 */
+  height: 16px; /* 아이콘 크기 조정 */
+}
+
+.inviteDeleteButton {
+  background: none; /* 배경 제거 */
+  border: none;     /* 테두리 제거 */
+  color: inherit;   /* 아이콘 색상 inherit */
+  cursor: pointer;  /* 마우스를 올렸을 때 손 모양으로 변경 */
+  padding: 0;       /* 패딩 제거 */
+}
+
+.inviteListItem {
+  display: flex;
+  justify-content: space-between; /* 양쪽 끝에 배치 */
+  align-items: center; /* 세로 중앙 정렬 */
+  padding: 5px 0; /* 상하 여백 */
+}
+
+.inviteListItem span {
+  margin-right: 10px; /* 유저 아이디와 삭제 아이콘 간 간격 */
+}
+
+.inviteDeleteButton {
+  background: none; /* 배경 제거 */
+  border: none;     /* 테두리 제거 */
+  color: inherit;   /* 아이콘 색상 inherit */
+  cursor: pointer;  /* 마우스를 올렸을 때 손 모양으로 변경 */
+  padding: 0;       /* 패딩 제거 */
+  margin-left: auto; /* 오른쪽으로 정렬 */
+}
+
+
+/* 인풋과 버튼을 가로 정렬 */
+.inviteInputWrapper {
+  display: flex;
+  justify-content: flex-start; /* 왼쪽 정렬 */
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  position: relative; /* 위치 조정할 수 있게 설정 */
+}
+
+/* 인풋 스타일 */
+.inviteInputWrapper .inputTask {
+  flex-grow: 1;
+  min-width: 150px;
+  height: 40px; /* 인풋 높이를 버튼과 동일하게 맞춤 */
+  padding: 0 10px;
+  font-size: 16px;
+  box-sizing: border-box; /* 패딩 포함하여 크기 설정 */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  line-height: 1.5; /* 글자 간격 맞추기 */
+}
+
+/* 버튼 스타일 */
+.inviteInputWrapper .addButton {
+  min-width: 50px;
+  height: 40px;
+  padding: 3px;
+  text-align: center;
+  font-size: 16px;
+  background-color: #ec7393;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  line-height: 1.5;
+  position: relative; /* 위치 조정 가능 */
+  top: -10px; /* 버튼을 인풋 필드 위로 올리기 */
+  transition: all 0.3s ease; /* 호버 효과 부드럽게 전환 */
+}
+
+/* 버튼 hover 상태 */
+.inviteInputWrapper .addButton:hover {
+  background-color: #d56a85; /* 호버시 색상 변경 */
+}
+
+
+
