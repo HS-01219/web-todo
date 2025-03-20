@@ -14,7 +14,7 @@ router.route('/')
     .get([check('teamId', 'teamId is Empty').notEmpty() 
         , errorValidate], getMembers)
     .post([check('teamId', 'teamId is Empty').notEmpty() 
-        , check('userId', 'userId is Empty').notEmpty()
+        , check('loginId', 'loginId is Empty').notEmpty()
         , errorValidate], inviteMember)
 
 router.delete('/:id', deleteMember);

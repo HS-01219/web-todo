@@ -1,11 +1,17 @@
 const { StatusCodes } = require("http-status-codes");
 const memberService = require("../service/memberService");
+const userService = require("../service/userService");
 
 const inviteMember = async (req, res) => {
-    const { teamId, userId } = req.body;
+    const { teamId, loginId } = req.body;
 
     try {
-        await memberService.inviteMember(teamId, userId);
+        const user = await userService.findUserByLoginId(loginId);
+        if(!user[0]){
+            return res.status(StatusCodes.NOT_FOUND).json({ message : "해당 아이디의 유저를 찾을 수 없습니다."});
+        }
+        
+        await memberService.inviteMember(teamId, user[0].id);
         return res.status(StatusCodes.CREATED).end();
     } catch (err) {
         console.log(err);
