@@ -25,8 +25,8 @@ const TodoList = ({ user }) => {
     axios.get(`http://localhost:5000/teams?userId=${savedUser}`)
       .then(response => {
         const fetchedTeams = response.data.map(team => ({
-          id: team.teamId,
-          name: team.teamName
+          id: team.id,
+          name: team.name
         }));
 
         if (fetchedTeams.length === 0) {
@@ -47,7 +47,7 @@ const TodoList = ({ user }) => {
   // 선택한 팀의 할일 목록 조회 (GET /works?teamId={teamId})
   useEffect(() => {
     if (selectedTeam) {
-      axios.get(`http://localhost:5000/works?teamId=${selectedTeam.id}`)
+      axios.get(`http://localhost:5000/works?teamId=${selectedTeam.id}&state=0`)
         .then(response => {
           setSelectedTeamTasks(response.data);
         })
@@ -168,8 +168,8 @@ const TodoList = ({ user }) => {
       .then(response => {
         if (response.status === 201) {
           const createdTeam = {
-            id: response.data.teamId,
-            name: response.data.teamName,
+            id: response.data.id,
+            name: response.data.name,
           };
           setTeams(prevTeams => [...prevTeams, createdTeam]);
           setSelectedTeam(createdTeam);
