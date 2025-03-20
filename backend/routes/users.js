@@ -1,9 +1,21 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const { check } = require('express-validator');
+const { errorValidate } = require('../middleware/validator');
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+const { join, login } = require('../controller/userController');
+
+
+router.post('/join'
+        , [check('loginId', 'loginId is Empty').notEmpty()
+        , check('pwd', 'pwd is Empty').notEmpty()
+        , errorValidate]
+        , join);
+
+router.post('/login'
+        , [check('loginId', 'loginId is Empty').notEmpty()
+            , check('pwd', 'pwd is Empty').notEmpty()
+            , errorValidate]
+        , login);
 
 module.exports = router;
