@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaCog, FaTrashAlt } from 'react-icons/fa';  // FontAwesome 아이콘들 임포트
+import { FaCog, FaTrashAlt } from 'react-icons/fa';
 import styles from './TodoList.module.css';
 
 const TeamSection = ({
@@ -12,12 +12,12 @@ const TeamSection = ({
   setNewTeamName,
   createNewTeam,
   closeTeamModal,
-  onDeleteTeam, // ✅ 삭제 함수 prop 추가
+  onDeleteTeam,
 }) => {
   const [settingsTeamId, setSettingsTeamId] = useState(null);
   const [inviteMemberModalOpen, setInviteMemberModalOpen] = useState(false);
-  const [inviteUserId, setInviteUserId] = useState('');  // 초대할 사용자 아이디
-  const [inviteUserList, setInviteUserList] = useState([]); // 초대된 사용자 리스트
+  const [inviteUserId, setInviteUserId] = useState('');
+  const [inviteUserList, setInviteUserList] = useState([]);
 
   const toggleSettings = (teamId, e) => {
     e.stopPropagation();
@@ -29,9 +29,9 @@ const TeamSection = ({
       alert('유저 아이디를 입력하세요.');
       return;
     }
-
+    
     setInviteUserList(prevList => [...prevList, inviteUserId.trim()]);
-    setInviteUserId('');  // 입력 필드 초기화
+    setInviteUserId('');
   };
 
   const handleDeleteUser = (userId) => {
@@ -39,8 +39,9 @@ const TeamSection = ({
   };
 
   const handleDeleteMember = (teamId) => {
-    if (window.confirm(`정말 "${teams.find(t => t.id === teamId)?.name}" 팀을 삭제하시겠습니까?`)) {
-      onDeleteTeam(teamId); // 부모 컴포넌트에서 삭제 실행
+    const teamName = teams.find(t => t.id === teamId)?.name || '해당 팀';
+    if (window.confirm(`정말 "${teamName}" 팀을 삭제하시겠습니까?`)) {
+      onDeleteTeam(teamId);
     }
     setSettingsTeamId(null);
   };
@@ -52,7 +53,7 @@ const TeamSection = ({
         {teams.map(team => (
           <li
             key={team.id}
-            className={`${styles.teamItem} ${selectedTeam.id === team.id ? styles.selectedTeam : ''}`}
+            className={`${styles.teamItem} ${selectedTeam?.id === team.id ? styles.selectedTeam : ''}`}
             onClick={() => setSelectedTeam(team)}
             style={{ position: 'relative' }}
           >
@@ -61,12 +62,12 @@ const TeamSection = ({
               className={styles.settingsButton}
               onClick={(e) => toggleSettings(team.id, e)}
             >
-              <FaCog /> {/* FontAwesome 기어 아이콘 */}
+              <FaCog />
             </button>
             {settingsTeamId === team.id && (
               <div className={styles.teamSettingsBox}>
                 <button
-                  onClick={() => setInviteMemberModalOpen(true)} // 초대 모달 열기
+                  onClick={() => setInviteMemberModalOpen(true)}
                   className={styles.teamSettingsButton}
                 >
                   팀원 초대하기
@@ -109,7 +110,6 @@ const TeamSection = ({
         </div>
       )}
 
-      {/* 팀원 초대 모달 */}
       {inviteMemberModalOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -139,7 +139,7 @@ const TeamSection = ({
                         onClick={() => handleDeleteUser(userId)}
                         className={styles.inviteDeleteButton}
                       >
-                        <FaTrashAlt /> {/* 쓰레기통 아이콘 */}
+                        <FaTrashAlt />
                       </button>
                     </li>
                   ))}

@@ -21,7 +21,7 @@ const TodoSection = ({
 }) => {
   return (
     <div className={styles.todoList}>
-      <h2>{selectedTeam.name}의 Todo List</h2>
+      <h2>{selectedTeam ? `${selectedTeam.name}의 Todo List` : '팀을 선택해주세요'}</h2>
       <div className={styles.inputWrapper}>
         <input
           type="text"
@@ -36,7 +36,7 @@ const TodoSection = ({
       </div>
       <h3>TO DO</h3>
       <ul className={styles.taskList}>
-        {(tasksByTeam[selectedTeam.id] || []).filter(task => !task.status).map(task => (
+        {(tasksByTeam[selectedTeam?.id] || []).filter(task => !task.status).map(task => (
           <li key={task.id} className={styles.taskItem}>
             <input
               type="checkbox"
@@ -76,7 +76,7 @@ const TodoSection = ({
 
       <h3>DONE</h3>
       <ul className={styles.doneTaskList}>
-        {(tasksByTeam[selectedTeam.id] || []).filter(task => task.status).map(task => (
+        {(tasksByTeam[selectedTeam?.id] || []).filter(task => task.status).map(task => (
           <li key={task.id} className={`${styles.taskItem} ${styles.completedTask}`}>
             <input
               type="checkbox"
