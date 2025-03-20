@@ -10,7 +10,7 @@ const join = async (req, res) => {
     
     try {
         const loginUser = await userService.findUserByLoginId(loginId);
-        if(loginUser.length > 0) {
+        if(loginUser.length) {
             return res.status(StatusCodes.CONFLICT).json({ message : "이미 존재하는 아이디입니다." });
         }
 

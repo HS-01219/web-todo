@@ -9,7 +9,10 @@ const createTeam = async (req, res) => {
     try {
         const result = await teamService.createTeam(name);
         await memberService.inviteMember(result.insertId, userId);
-        return res.status(StatusCodes.CREATED).end();
+        return res.status(StatusCodes.CREATED).json({
+            "id" : result.insertId,
+            "name" : name
+        });
     } catch (err) {
         console.log(err);
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
