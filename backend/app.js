@@ -9,6 +9,8 @@ app.listen(process.env.PORT);
 const createError = require('http-errors');
 const cookieParser = require('cookie-parser');
 
+const cors = require('cors');
+
 // var express = require('express');
 // var path = require('path');
 // var logger = require('morgan');
@@ -27,6 +29,7 @@ const { StatusCodes } = require('http-status-codes');
 // app.set('view engine', 'pug');
 
 // app.use(logger('dev'));
+app.use(cors());
 app.use(express.json());
 // app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

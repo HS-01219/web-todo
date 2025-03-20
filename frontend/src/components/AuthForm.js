@@ -4,47 +4,37 @@ import styles from './AuthForm.module.css';
 
 const AuthForm = ({ onLogin }) => {
   const [mode, setMode] = useState('login'); // 'login' or 'register'
-  const [userId, setUserId] = useState('');
-  const [password, setPassword] = useState('');
+  const [loginId, setUserId] = useState('');
+  const [pwd, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState(''); // 에러 메시지 상태
-
-  const dummyUser = { id: 1, userId: 'testUser', password: '1234' };
 
   const handleSubmit = async () => {
     setErrorMessage(''); // 에러 메시지 초기화
 
-    if (mode === 'register' && password !== confirmPassword) {
+    if (mode === 'register' && pwd !== confirmPassword) {
       setErrorMessage('비밀번호가 일치하지 않습니다.');
       return;
     }
 
     try {
       if (mode === 'login') {
-        if (userId === dummyUser.userId && password === dummyUser.password) {
-          onLogin(dummyUser);
-          return;
-        }
-
-        const response = await axios.post('http://localhost:8080/api/login', { userId, password });
-        if (response.data.success) {
-          onLogin(response.data.user);
-        } else {
-          setErrorMessage('아이디 또는 비밀번호를 확인해주세요.');
+        const response = await axios.post('http://localhost:5000/users/login', { loginId: loginId, pwd: pwd });
+        console.log(response)
+        if (response.status === 200) {
+          localStorage.setItem('userId', JSON.stringify(response.data.id));
+          onLogin(response.data.id); 
         }
       } else {
-        const response = await axios.post('http://localhost:8080/api/register', { userId, password });
-        if (response.data.success) {
+        const response = await axios.post('http://localhost:5000/users/join', { loginId: loginId, pwd: pwd });
+        if (response.status === 201) {
           alert('회원가입이 완료되었습니다. 로그인 해주세요.');
           setMode('login'); // 로그인 화면으로 전환
           resetForm(); // 폼 초기화
-        } else {
-          setErrorMessage('회원가입 실패: 이미 존재하는 아이디입니다.');
         }
       }
     } catch (error) {
-      console.error(`${mode === 'login' ? 'Login' : 'Register'} error:`, error);
-      setErrorMessage('서버 연결 실패: 백엔드가 실행 중인지 확인하세요.');
+      setErrorMessage(error.response.data.message);
     }
   };
 
@@ -63,14 +53,14 @@ const AuthForm = ({ onLogin }) => {
         <input
           type="text"
           placeholder="User ID"
-          value={userId}
+          value={loginId}
           onChange={(e) => setUserId(e.target.value)}
           className={`${styles.input} ${errorMessage ? styles.errorInput : ''}`}
         />
         <input
           type="password"
           placeholder="Password"
-          value={password}
+          value={pwd}
           onChange={(e) => setPassword(e.target.value)}
           className={`${styles.input} ${errorMessage ? styles.errorInput : ''}`}
         />
