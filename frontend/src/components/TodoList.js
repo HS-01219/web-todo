@@ -5,34 +5,39 @@ import styles from './TodoList.module.css';
 import TeamSection from './TeamSection';
 import TodoSection from './TodoSection';
 
-const dummyTeams = [
-  { id: 1, name: '팀 A' },
-  { id: 2, name: '팀 B' },
-  { id: 3, name: '팀 C' },
-];
-
 const TodoList = ({ user }) => {
   const [tasksByTeam, setTasksByTeam] = useState({});
   const [newTask, setNewTask] = useState('');
   const [editingTaskId, setEditingTaskId] = useState(null);
-  const [selectedTeam, setSelectedTeam] = useState(dummyTeams[0]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [newTeamName, setNewTeamName] = useState('');
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
-  const [teams, setTeams] = useState(dummyTeams); // ✅ 초기값을 dummyTeams로 설정
-
+  const [teams, setTeams] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState(null);
+  const savedUser = JSON.parse(localStorage.getItem('userId'));
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/todos?teamId=${selectedTeam.id}`)
+    axios.get('http://localhost:5000/teams?userId='+savedUser)
       .then(response => {
-        setTasksByTeam(prev => ({
-          ...prev,
-          [selectedTeam.id]: response.data
-        }));
+        setTeams(response.data);
+        if (response.data.length > 0) {
+          setSelectedTeam(response.data[0]);
+        }
       })
-      .catch(error => console.error('Error fetching tasks:', error));
-  }, [selectedTeam.id]);
+      .catch(error => console.error('팀 목록 가져오기 실패:', error));
+  }, []);
+  
+  // useEffect(() => {
+  //   axios.get(`http://localhost:8080/api/todos?teamId=${selectedTeam.id}`)
+  //     .then(response => {
+  //       setTasksByTeam(prev => ({
+  //         ...prev,
+  //         [selectedTeam.id]: response.data
+  //       }));
+  //     })
+  //     .catch(error => console.error('Error fetching tasks:', error));
+  // }, [selectedTeam.id]);
 
 
   useEffect(() => {

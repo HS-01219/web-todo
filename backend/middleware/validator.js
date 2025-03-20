@@ -4,7 +4,7 @@ const {StatusCodes} = require('http-status-codes');
 exports.errorValidate = (req, res, next) => {
     const error = validationResult(req);
     if(!error.isEmpty()) {
-        return res.status(StatusCodes.BAD_REQUEST).json({errors : error.array()});
+        return res.status(StatusCodes.BAD_REQUEST).json({ message : "입력 값을 다시 확인해주세요. "});
     }
     return next(); 
 }
