@@ -1,4 +1,3 @@
-// src/components/TodoList.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './TodoList.module.css';
@@ -16,9 +15,11 @@ const TodoList = ({ user }) => {
   const [teams, setTeams] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [selectedTeamTasks, setSelectedTeamTasks] = useState([]);
+  // 팀원 초대에 필요한 상태 변수 추가
+  const [inviteMemberId, setInviteMemberId] = useState(''); // 초대할 팀원의 loginId
+  const [isInviting, setIsInviting] = useState(false); // 초대 진행 중인지 여부
 
-  // localStorage에 저장된 userId (문자열)
-  const savedUser = JSON.parse(localStorage.getItem('userId'));
+  const savedUser = JSON.parse(localStorage.getItem('userId')); // 로컬 스토리지에서 userId 가져오기
 
   // 팀 목록 조회 (GET /teams?userId={userId})
   useEffect(() => {
@@ -44,6 +45,7 @@ const TodoList = ({ user }) => {
       });
   }, [savedUser]);
 
+  // 선택된 팀에 대한 할일 목록 조회
   useEffect(() => {
     if (selectedTeam) {
       axios.get(`http://localhost:5000/works?teamId=${selectedTeam.id}&state=0`)
@@ -59,21 +61,52 @@ const TodoList = ({ user }) => {
         });
     }
   }, [selectedTeam]);
-  
+  //[{"id" :15,"name" : "할일", "state": 0, "teamId": 1, "userId": 1}]
+
+  // tasksByTeam 상태가 변경될 때마다 콘솔에 출력하여 값이 잘 들어갔는지 확인
+  useEffect(() => {
+    console.log('tasksByTeam:', tasksByTeam);
+  }, [tasksByTeam]);
+
+  // 팀원 초대 처리 (POST /members)
+  const inviteMember = () => {
+    if (!inviteMemberId.trim()) return; // 아이디가 비어있으면 리턴
+
+    const memberData = {
+      teamId: selectedTeam.id, // 현재 선택된 팀 ID
+      loginId: inviteMemberId // 초대할 팀원의 loginId
+    };
+
+    setIsInviting(true); // 초대 진행 중 상태로 설정
+
+    axios.post('http://localhost:5000/members', memberData)
+      .then(response => {
+        if (response.status === 201) {
+          console.log('팀원 초대 성공');
+          setInviteMemberId(''); // 초대 후 입력값 초기화
+        }
+      })
+      .catch(error => {
+        console.error('팀원 초대 실패:', error);
+      })
+      .finally(() => {
+        setIsInviting(false); // 초대 진행 완료 상태로 변경
+      });
+  };
 
   // 할일 등록 (POST /works)
   const addTask = () => {
-    if (!newTask.trim() || !selectedTeam) return;
+    if (!newTask.trim()) return; // 할일 내용이 비어있으면 리턴
+
     const newTodo = {
       name: newTask,
       userId: user.id,
-      teamId: selectedTeam.id
+      teamId: selectedTeam ? selectedTeam.id : null
     };
 
-    // 로컬 상태 업데이트
+    // 로컬 상태 업데이트 
     setSelectedTeamTasks(prev => [...prev, newTodo]);
 
-    // API 요청: 팀 할일 등록의 경우 { teamId, name }
     axios.post('http://localhost:5000/works', newTodo)
       .then(response => {
         if (response.status === 201) {
@@ -82,7 +115,7 @@ const TodoList = ({ user }) => {
       })
       .catch(error => console.error('할일 등록 에러:', error));
 
-    setNewTask('');
+    setNewTask(''); // 입력 필드 초기화
   };
 
   // 할일 상태 토글 (TODO <-> DONE) : PUT /works
@@ -209,6 +242,11 @@ const TodoList = ({ user }) => {
         setNewTeamName={setNewTeamName}
         createNewTeam={createNewTeam}
         closeTeamModal={closeTeamModal}
+        // 팀원 초대 UI 추가
+        inviteMemberId={inviteMemberId}
+        setInviteMemberId={setInviteMemberId}
+        inviteMember={inviteMember}
+        isInviting={isInviting}
       />
       <TodoSection
         selectedTeam={selectedTeam}
@@ -225,6 +263,7 @@ const TodoList = ({ user }) => {
         isModalOpen={isModalOpen}
         closeDeleteModal={closeDeleteModal}
         deleteTask={deleteTask}
+        startEditing={startEditing}   // 추가된 함수 전달
       />
     </div>
   );

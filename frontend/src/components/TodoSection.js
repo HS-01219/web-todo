@@ -1,6 +1,7 @@
 // src/components/TodoSection.js
 import React from 'react';
 import styles from './TodoList.module.css';
+import TodoSection from './TodoSection';
 
 const TodoSection = ({
   selectedTeam,
@@ -19,6 +20,13 @@ const TodoSection = ({
   closeDeleteModal,
   deleteTask,
 }) => {
+  //값 받았는지 확인
+  console.log('selectedTeam:', selectedTeam);
+  console.log('tasksByTeam:', tasksByTeam);
+  console.log('tasksByTeam[selectedTeam?.id]:', tasksByTeam[selectedTeam?.id]);
+
+
+
   return (
     <div className={styles.todoList}>
       <h2>{selectedTeam ? `${selectedTeam.name}의 Todo List` : '팀을 선택해주세요'}</h2>
@@ -36,7 +44,6 @@ const TodoSection = ({
       </div>
       <h3>TO DO</h3>
       <ul className={styles.taskList}>
-        
         {(tasksByTeam[selectedTeam?.id] || []).filter(task => !task.status).length === 0 ? (
           <li className={styles.emptyMessage}>할 일이 없습니다.</li>
         ) : (
