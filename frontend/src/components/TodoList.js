@@ -263,7 +263,6 @@ const TodoList = ({ user }) => {
         isModalOpen={isModalOpen}
         closeDeleteModal={closeDeleteModal}
         deleteTask={deleteTask}
-        startEditing={startEditing}   // 추가된 함수 전달
       />
     </div>
   );

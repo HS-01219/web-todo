@@ -1,7 +1,6 @@
 // src/components/TodoSection.js
 import React from 'react';
 import styles from './TodoList.module.css';
-import TodoSection from './TodoSection';
 
 const TodoSection = ({
   selectedTeam,
