@@ -43,12 +43,12 @@ const TodoSection = ({
       </div>
       <h3>TO DO</h3>
       <ul className={styles.taskList}>
-        {(tasksByTeam[selectedTeam?.id] || [])
+        {(tasksByTeam || [])
           .filter(task => task.state === 0) // state가 0인 항목만 필터링
           .length === 0 ? (
           <li className={styles.emptyMessage}>할 일이 없습니다.</li>
         ) : (
-          (tasksByTeam[selectedTeam?.id] || [])
+          (tasksByTeam || [])
             .filter(task => task.state === 0) // state가 0인 항목만 필터링
             .map(task => (
               <li key={task.id} className={styles.taskItem}>
@@ -91,7 +91,7 @@ const TodoSection = ({
 
       <h3>DONE</h3>
       <ul className={styles.doneTaskList}>
-        {(tasksByTeam[selectedTeam?.id] || [])
+        {(tasksByTeam || [])
           .filter(task => task.state === 1) // state가 1인 항목만 필터링
           .map(task => (
             <li key={task.id} className={`${styles.taskItem} ${styles.completedTask}`}>
