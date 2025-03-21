@@ -37,7 +37,7 @@ const TodoSection = ({
   };
 
   // 내 할일을 팀 목록처럼 추가하기
-  const tasksToDisplay = selectedTeam ? tasksByTeam[selectedTeam.id] : myTasks;
+  const tasksToDisplay = selectedTeam ? tasksByTeam : myTasks;
 
   return (
     <div className={styles.todoList}>
