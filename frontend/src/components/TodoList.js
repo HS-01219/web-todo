@@ -131,7 +131,7 @@ const addTask = () => {
     });
   
     // 서버에 상태 업데이트 후 리스트 재호출
-    axios.put(`http://localhost:5000/works/${taskId}`, { state: newState })
+    axios.put(`http://localhost:5000/works`, { id : taskId, state: newState })
       .then(() => {
         return axios.get(`http://localhost:5000/works?teamId=${selectedTeam.id}`);
       })
