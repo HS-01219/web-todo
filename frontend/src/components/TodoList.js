@@ -18,7 +18,7 @@ const TodoList = ({ user }) => {
   // 팀원 초대에 필요한 상태 변수 추가
   const [inviteMemberId, setInviteMemberId] = useState(''); // 초대할 팀원의 loginId
   const [isInviting, setIsInviting] = useState(false); // 초대 진행 중인지 여부
-
+  const [teamMembers, setTeamMembers] = useState([]);  // 팀 멤버 목록 상태 변수 추가
   const savedUser = JSON.parse(localStorage.getItem('userId')); // 로컬 스토리지에서 userId 가져오기
 
   // 팀 목록 조회 (GET /teams?userId={userId})
@@ -48,7 +48,7 @@ const TodoList = ({ user }) => {
   // 선택된 팀에 대한 할일 목록 조회
   useEffect(() => {
     if (selectedTeam) {
-      axios.get(`http://localhost:5000/works?teamId=${selectedTeam.id}&state=0`)
+      axios.get(`http://localhost:5000/works?teamId=${selectedTeam.id}`)
         .then(response => {
           setSelectedTeamTasks(response.data);
           setTasksByTeam(prev => ({
@@ -67,32 +67,6 @@ const TodoList = ({ user }) => {
   useEffect(() => {
     console.log('tasksByTeam:', tasksByTeam);
   }, [tasksByTeam]);
-
-  // 팀원 초대 처리 (POST /members)
-  const inviteMember = () => {
-    if (!inviteMemberId.trim()) return; // 아이디가 비어있으면 리턴
-
-    const memberData = {
-      teamId: selectedTeam.id, // 현재 선택된 팀 ID
-      loginId: inviteMemberId // 초대할 팀원의 loginId
-    };
-
-    setIsInviting(true); // 초대 진행 중 상태로 설정
-
-    axios.post('http://localhost:5000/members', memberData)
-      .then(response => {
-        if (response.status === 201) {
-          console.log('팀원 초대 성공');
-          setInviteMemberId(''); // 초대 후 입력값 초기화
-        }
-      })
-      .catch(error => {
-        console.error('팀원 초대 실패:', error);
-      })
-      .finally(() => {
-        setIsInviting(false); // 초대 진행 완료 상태로 변경
-      });
-  };
 
   // 할일 등록 (POST /works)
   const addTask = () => {
@@ -227,6 +201,59 @@ const TodoList = ({ user }) => {
         });
       })
       .catch(error => console.error('팀 삭제 실패:', error));
+  };
+
+    // 팀원 초대 처리
+  const inviteMember = () => {
+    if (!inviteMemberId.trim()) return; // 아이디가 비어있으면 리턴
+
+    const memberData = {
+      teamId: selectedTeam.id, // 현재 선택된 팀 ID
+      loginId: inviteMemberId // 초대할 팀원의 loginId
+    };
+
+    setIsInviting(true); // 초대 진행 중 상태로 설정
+
+    axios.post('http://localhost:5000/members', memberData)
+      .then(response => {
+        if (response.status === 201) {
+          console.log('팀원 초대 성공');
+          setInviteMemberId(''); // 초대 후 입력값 초기화
+        }
+      })
+      .catch(error => {
+        console.error('팀원 초대 실패:', error);
+      })
+      .finally(() => {
+        setIsInviting(false); // 초대 진행 완료 상태로 변경
+      });
+  };
+
+  // 팀원 조회
+  const getTeamMembers = () => {
+    axios.get(`http://localhost:5000/members?teamId=${selectedTeam.id}`)
+      .then(response => {
+        if (response.status === 200) {
+          setTeamMembers(response.data); // 팀원 목록 업데이트
+        }
+      })
+      .catch(error => {
+        console.error('팀원 조회 실패:', error);
+      });
+  };
+
+  // 팀원 삭제
+  const deleteMember = (memberId) => {
+    axios.delete(`http://localhost:5000/members/${memberId}`)
+      .then(response => {
+        if (response.status === 200) {
+          console.log('팀원 삭제 성공');
+          setTeamMembers(prevMembers => prevMembers.filter(member => member.id !== memberId)); // 삭제된 팀원 목록에서 제거
+        }
+      })
+      .catch(error => {
+        console.error('팀원 삭제 실패:', error);
+      });
   };
 
   return (

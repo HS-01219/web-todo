@@ -43,64 +43,70 @@ const TodoSection = ({
       </div>
       <h3>TO DO</h3>
       <ul className={styles.taskList}>
-        {(tasksByTeam[selectedTeam?.id] || []).filter(task => !task.status).length === 0 ? (
+        {(tasksByTeam[selectedTeam?.id] || [])
+          .filter(task => task.state === 0) // state가 0인 항목만 필터링
+          .length === 0 ? (
           <li className={styles.emptyMessage}>할 일이 없습니다.</li>
         ) : (
-          (tasksByTeam[selectedTeam?.id] || []).filter(task => !task.status).map(task => (
-            <li key={task.id} className={styles.taskItem}>
+          (tasksByTeam[selectedTeam?.id] || [])
+            .filter(task => task.state === 0) // state가 0인 항목만 필터링
+            .map(task => (
+              <li key={task.id} className={styles.taskItem}>
+                <input
+                  type="checkbox"
+                  checked={task.status}
+                  onChange={() => toggleTaskStatus(task.id)}
+                  className={styles.checkbox}
+                />
+                {editingTaskId === task.id ? (
+                  <input
+                    type="text"
+                    value={task.name}
+                    onChange={(e) => handleEditChange(task.id, e)}
+                    onKeyPress={(e) => handleEditKeyPress(task.id, e)}
+                    autoFocus
+                    className={styles.editInput}
+                  />
+                ) : (
+                  <span className={styles.taskName}>{task.name}</span>
+                )}
+                {editingTaskId === task.id ? (
+                  <button onClick={() => setEditingTaskId(null)} className={styles.button}>
+                    완료
+                  </button>
+                ) : (
+                  <>
+                    <button onClick={() => startEditing(task.id)} className={styles.button}>
+                      수정
+                    </button>
+                    <button onClick={() => openDeleteModal(task.id)} className={`${styles.button} ${styles.deleteButton}`}>
+                      삭제
+                    </button>
+                  </>
+                )}
+              </li>
+            ))
+        )}
+      </ul>
+
+      <h3>DONE</h3>
+      <ul className={styles.doneTaskList}>
+        {(tasksByTeam[selectedTeam?.id] || [])
+          .filter(task => task.state === 1) // state가 1인 항목만 필터링
+          .map(task => (
+            <li key={task.id} className={`${styles.taskItem} ${styles.completedTask}`}>
               <input
                 type="checkbox"
                 checked={task.status}
                 onChange={() => toggleTaskStatus(task.id)}
                 className={styles.checkbox}
               />
-              {editingTaskId === task.id ? (
-                <input
-                  type="text"
-                  value={task.name}
-                  onChange={(e) => handleEditChange(task.id, e)}
-                  onKeyPress={(e) => handleEditKeyPress(task.id, e)}
-                  autoFocus
-                  className={styles.editInput}
-                />
-              ) : (
-                <span className={styles.taskName}>{task.name}</span>
-              )}
-              {editingTaskId === task.id ? (
-                <button onClick={() => setEditingTaskId(null)} className={styles.button}>
-                  완료
-                </button>
-              ) : (
-                <>
-                  <button onClick={() => startEditing(task.id)} className={styles.button}>
-                    수정
-                  </button>
-                  <button onClick={() => openDeleteModal(task.id)} className={`${styles.button} ${styles.deleteButton}`}>
-                    삭제
-                  </button>
-                </>
-              )}
+              <span className={styles.taskName}>{task.name}</span>
+              <button onClick={() => openDeleteModal(task.id)} className={`${styles.button} ${styles.deleteButton}`}>
+                삭제
+              </button>
             </li>
-          ))
-        )}
-      </ul>
-
-      <h3>DONE</h3>
-      <ul className={styles.doneTaskList}>
-        {(tasksByTeam[selectedTeam?.id] || []).filter(task => task.status).map(task => (
-          <li key={task.id} className={`${styles.taskItem} ${styles.completedTask}`}>
-            <input
-              type="checkbox"
-              checked={task.status}
-              onChange={() => toggleTaskStatus(task.id)}
-              className={styles.checkbox}
-            />
-            <span className={styles.taskName}>{task.name}</span>
-            <button onClick={() => openDeleteModal(task.id)} className={`${styles.button} ${styles.deleteButton}`}>
-              삭제
-            </button>
-          </li>
-        ))}
+          ))}
       </ul>
 
       {isModalOpen && (

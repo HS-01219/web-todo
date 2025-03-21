@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaCog, FaTrashAlt } from 'react-icons/fa';
+import axios from 'axios';
 import styles from './TodoList.module.css';
 
 const TeamSection = ({
@@ -18,42 +19,117 @@ const TeamSection = ({
   const [inviteMemberModalOpen, setInviteMemberModalOpen] = useState(false);
   const [inviteUserId, setInviteUserId] = useState('');
   const [inviteUserList, setInviteUserList] = useState([]);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [inviteMemberId, setInviteMemberId] = useState('');
+  const [isInviting, setIsInviting] = useState(false);
 
+  // 팀원 초대 처리
+  const inviteMember = () => {
+    if (!inviteMemberId.trim()) return; // 아이디가 비어있으면 리턴
+
+    const memberData = {
+      teamId: selectedTeam.id, // 현재 선택된 팀 ID
+      loginId: inviteMemberId, // 초대할 팀원의 loginId
+    };
+
+    setIsInviting(true); // 초대 진행 중 상태로 설정
+
+    axios
+      .post('http://localhost:5000/members', memberData)
+      .then((response) => {
+        if (response.status === 201) {
+          console.log('팀원 초대 성공');
+          setInviteMemberId(''); // 초대 후 입력값 초기화
+          getTeamMembers(); // 팀원 목록 갱신
+        }
+      })
+      .catch((error) => {
+        console.error('팀원 초대 실패:', error);
+      })
+      .finally(() => {
+        setIsInviting(false); // 초대 진행 완료 상태로 변경
+      });
+  };
+
+  // 팀원 조회
+  const getTeamMembers = () => {
+    axios
+      .get(`http://localhost:5000/members?teamId=${selectedTeam.id}`)
+      .then((response) => {
+        if (response.status === 200) {
+          setTeamMembers(response.data); // 팀원 목록 업데이트
+        }
+      })
+      .catch((error) => {
+        console.error('팀원 조회 실패:', error);
+      });
+  };
+
+  // 팀원 삭제
+  const deleteMember = (memberId) => {
+    axios
+      .delete(`http://localhost:5000/members/${memberId}`)
+      .then((response) => {
+        if (response.status === 200) {
+          console.log('팀원 삭제 성공');
+          setTeamMembers((prevMembers) =>
+            prevMembers.filter((member) => member.id !== memberId)
+          ); // 삭제된 팀원 목록에서 제거
+        }
+      })
+      .catch((error) => {
+        console.error('팀원 삭제 실패:', error);
+      });
+  };
+
+  // 팀 설정 열기
   const toggleSettings = (teamId, e) => {
     e.stopPropagation();
     setSettingsTeamId(settingsTeamId === teamId ? null : teamId);
   };
 
+  // 팀원 초대 버튼 클릭 시
   const handleInviteMember = () => {
     if (!inviteUserId.trim()) {
       alert('유저 아이디를 입력하세요.');
       return;
     }
-    
-    setInviteUserList(prevList => [...prevList, inviteUserId.trim()]);
+
+    setInviteUserList((prevList) => [...prevList, inviteUserId.trim()]);
     setInviteUserId('');
   };
 
+  // 팀원 삭제
   const handleDeleteUser = (userId) => {
-    setInviteUserList(prevList => prevList.filter(user => user !== userId));
+    setInviteUserList((prevList) => prevList.filter((user) => user !== userId));
   };
 
+  // 팀 삭제
   const handleDeleteMember = (teamId) => {
-    const teamName = teams.find(t => t.id === teamId)?.name || '해당 팀';
+    const teamName = teams.find((t) => t.id === teamId)?.name || '해당 팀';
     if (window.confirm(`정말 "${teamName}" 팀을 삭제하시겠습니까?`)) {
       onDeleteTeam(teamId);
     }
     setSettingsTeamId(null);
   };
 
+  // 팀 선택 시 팀원 조회
+  useEffect(() => {
+    if (selectedTeam) {
+      getTeamMembers(); // 팀이 선택되면 팀원 목록을 조회
+    }
+  }, [selectedTeam]);
+
   return (
     <div className={styles.teamList}>
       <h3>Team List</h3>
       <ul className={styles.teamListWrapper}>
-        {teams.map(team => (
+        {teams.map((team) => (
           <li
             key={team.id}
-            className={`${styles.teamItem} ${selectedTeam?.id === team.id ? styles.selectedTeam : ''}`}
+            className={`${styles.teamItem} ${
+              selectedTeam?.id === team.id ? styles.selectedTeam : ''
+            }`}
             onClick={() => setSelectedTeam(team)}
             style={{ position: 'relative' }}
           >
@@ -99,10 +175,16 @@ const TeamSection = ({
               className={styles.inputTask}
             />
             <div>
-              <button onClick={createNewTeam} className={`${styles.button} ${styles.addButton}`}>
+              <button
+                onClick={createNewTeam}
+                className={`${styles.button} ${styles.addButton}`}
+              >
                 팀 만들기
               </button>
-              <button onClick={closeTeamModal} className={`${styles.button} ${styles.cancelButton}`}>
+              <button
+                onClick={closeTeamModal}
+                className={`${styles.button} ${styles.cancelButton}`}
+              >
                 취소
               </button>
             </div>
@@ -123,10 +205,11 @@ const TeamSection = ({
                 className={styles.inputTask}
               />
               <button
-                onClick={handleInviteMember}
+                onClick={inviteMember}
                 className={`${styles.button} ${styles.addButton}`}
+                disabled={isInviting}
               >
-                초대
+                {isInviting ? '초대 중...' : '초대'}
               </button>
             </div>
             <div className={styles.inviteList}>
@@ -147,7 +230,10 @@ const TeamSection = ({
               )}
             </div>
             <div>
-              <button onClick={() => setInviteMemberModalOpen(false)} className={`${styles.button} ${styles.cancelButton}`}>
+              <button
+                onClick={() => setInviteMemberModalOpen(false)}
+                className={`${styles.button} ${styles.cancelButton}`}
+              >
                 닫기
               </button>
             </div>
