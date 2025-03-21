@@ -15,27 +15,39 @@ const TodoList = ({ user }) => {
   const [teams, setTeams] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [selectedTeamTasks, setSelectedTeamTasks] = useState([]);
+  const [myTasks, setMyTasks] = useState([]); // 내 할일 상태 추가
   // 팀원 초대에 필요한 상태 변수 추가
   const [inviteMemberId, setInviteMemberId] = useState(''); // 초대할 팀원의 loginId
   const [isInviting, setIsInviting] = useState(false); // 초대 진행 중인지 여부
   const [teamMembers, setTeamMembers] = useState([]);  // 팀 멤버 목록 상태 변수 추가
   const savedUser = JSON.parse(localStorage.getItem('userId')); // 로컬 스토리지에서 userId 가져오기
 
-  // 팀 목록 조회 (GET /teams?userId={userId})
   useEffect(() => {
+    // 팀 목록 가져오기
     axios.get(`http://localhost:5000/teams?userId=${savedUser}`)
       .then(response => {
         const fetchedTeams = response.data.map(team => ({
           id: team.id,
           name: team.name
         }));
-
+  
         if (fetchedTeams.length === 0) {
           setTeams([]);
           setSelectedTeam(null);
         } else {
           setTeams(fetchedTeams);
           setSelectedTeam(fetchedTeams[0]);
+        }
+  
+        // 팀 목록이 비어있거나 선택된 팀 ID가 null인 경우 내 할일 가져오기
+        if (fetchedTeams.length === 0 || fetchedTeams[0].id === null) {
+          axios.get(`http://localhost:5000/works?userId=${savedUser}&teamId=null`)
+            .then(response => {
+              setMyTasks(response.data);  // 내 할일을 상태에 저장
+            })
+            .catch(error => {
+              console.error('내 할일 가져오기 실패:', error);
+            });
         }
       })
       .catch(error => {
@@ -69,44 +81,70 @@ const TodoList = ({ user }) => {
   }, [tasksByTeam]);
 
   // 할일 등록 (POST /works)
-  const addTask = () => {
-    if (!newTask.trim()) return; // 할일 내용이 비어있으면 리턴
+const addTask = () => {
+  if (!newTask.trim()) return; // 입력값 비어있으면 return
 
-    const newTodo = {
-      name: newTask,
-      userId: user.id,
-      teamId: selectedTeam ? selectedTeam.id : null
-    };
-
-    // 로컬 상태 업데이트 
-    setSelectedTeamTasks(prev => [...prev, newTodo]);
-
-    axios.post('http://localhost:5000/works', newTodo)
-      .then(response => {
-        if (response.status === 201) {
-          console.log('할일 등록 성공');
-        }
-      })
-      .catch(error => console.error('할일 등록 에러:', error));
-
-    setNewTask(''); // 입력 필드 초기화
+  const newTodoRequest = {
+    name: newTask,
+    userId: user.id,
+    teamId: selectedTeam ? selectedTeam.id : null
   };
 
-  // 할일 상태 토글 (TODO <-> DONE) : PUT /works
+  axios.post('http://localhost:5000/works', newTodoRequest)
+    .then(response => {
+      if (response.status === 201) {
+        const savedTask = response.data; // 서버가 반환하는 저장된 task
+
+        // 만약 팀 할일이면 해당 팀 목록에 추가
+        if (selectedTeam && selectedTeam.id) {
+          setSelectedTeamTasks(prev => [...prev, savedTask]);
+          setTasksByTeam(prev => ({
+            ...prev,
+            [selectedTeam.id]: [...(prev[selectedTeam.id] || []), savedTask]
+          }));
+        } else {
+          // 팀이 선택 안 되어있으면 내 할일에 추가 (원한다면 setMyTasks 로)
+          console.log('내 할일 등록 성공:', savedTask);
+        }
+      }
+    })
+    .catch(error => console.error('할일 등록 에러:', error));
+
+  setNewTask(''); // 입력 필드 초기화
+};
+
+
   const toggleTaskStatus = (taskId) => {
-    const task = selectedTeamTasks.find(t => t.id === taskId);
-    if (!task) return;
-
-    const newStatus = task.status ? 0 : 1;
-
-    // 로컬 상태 업데이트
-    setSelectedTeamTasks(prev => prev.map(t =>
-      t.id === taskId ? { ...t, status: newStatus } : t
-    ));
-
-    // API 요청: 상태 변경
-    axios.put('http://localhost:5000/works', { id: taskId, state: newStatus })
-      .catch(error => console.error('Error updating task status:', error));
+    if (!selectedTeam?.id) return;
+  
+    const currentTask = tasksByTeam[selectedTeam.id]?.find(t => t.id === taskId);
+    if (!currentTask) return;
+  
+    const newState = currentTask.state === 0 ? 1 : 0;
+  
+    // 로컬 상태 먼저 업데이트
+    setTasksByTeam(prev => {
+      const updatedTasks = prev[selectedTeam.id].map(task =>
+        task.id === taskId ? { ...task, state: newState } : task
+      );
+      return { ...prev, [selectedTeam.id]: updatedTasks };
+    });
+  
+    // 서버에 상태 업데이트 후 리스트 재호출
+    axios.put(`http://localhost:5000/works/${taskId}`, { state: newState })
+      .then(() => {
+        return axios.get(`http://localhost:5000/works?teamId=${selectedTeam.id}`);
+      })
+      .then(response => {
+        setTasksByTeam(prev => ({
+          ...prev,
+          [selectedTeam.id]: response.data,
+        }));
+        setSelectedTeamTasks(response.data); // 혹시 selectedTeamTasks도 따로 관리하고 있다면 이 라인 추가
+      })
+      .catch(error => {
+        console.error('상태 변경 오류:', error);
+      });
   };
 
   // 할일 이름 수정 (PUT /works)
@@ -290,6 +328,7 @@ const TodoList = ({ user }) => {
         isModalOpen={isModalOpen}
         closeDeleteModal={closeDeleteModal}
         deleteTask={deleteTask}
+        myTasks={myTasks}  // 추가된 내 할 일
       />
     </div>
   );
