@@ -16,16 +16,15 @@ const createWork = async (name, userId, teamId) => {
 };
 
 const getWorks = async (userId, teamId, state) => {
-    let sql = `SELECT * FROM works WHERE state = ?`;
-    const values = [state];
-
+    let sql = `SELECT * FROM works`;
+    let values = [];
     if (userId) {
-        sql += ` AND user_id = ?`; 
+        sql += ` WHERE user_id = ?`; 
         values.push(userId);
     }
 
     if (teamId) {
-        sql += ` AND team_id = ?`; 
+        sql += ` WHERE team_id = ?`; 
         values.push(teamId);
     }
 

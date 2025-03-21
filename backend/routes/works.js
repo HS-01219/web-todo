@@ -12,7 +12,6 @@ const {
 
 router.route('/')
     .get([validateEitherOne(['userId', 'teamId']) 
-        , check('state', 'state is Empty').notEmpty()
         , errorValidate], getWorks)
     .post([validateEitherOne(['userId', 'teamId'])
         , check('name', 'name is Empty').notEmpty()
