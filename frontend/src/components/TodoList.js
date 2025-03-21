@@ -47,7 +47,7 @@ const TodoList = ({ user }) => {
 
   // 선택된 팀에 대한 할일 목록 조회
   useEffect(() => {
-    if (selectedTeam) {
+    if (selectedTeam && selectedTeam.id) {
       axios.get(`http://localhost:5000/works?teamId=${selectedTeam.id}`)
         .then(response => {
           setSelectedTeamTasks(response.data);
