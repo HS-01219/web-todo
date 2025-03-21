@@ -44,18 +44,22 @@ const TodoList = ({ user }) => {
       });
   }, [savedUser]);
 
-  // 선택한 팀의 할일 목록 조회 (GET /works?teamId={teamId})
   useEffect(() => {
     if (selectedTeam) {
       axios.get(`http://localhost:5000/works?teamId=${selectedTeam.id}&state=0`)
         .then(response => {
           setSelectedTeamTasks(response.data);
+          setTasksByTeam(prev => ({
+            ...prev,
+            [selectedTeam.id]: response.data,
+          }));
         })
         .catch(error => {
           console.error('할일 목록 가져오기 실패:', error);
         });
     }
   }, [selectedTeam]);
+  
 
   // 할일 등록 (POST /works)
   const addTask = () => {

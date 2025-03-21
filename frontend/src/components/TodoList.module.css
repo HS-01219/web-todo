@@ -401,3 +401,8 @@
 
 
 
+.emptyMessage {
+  text-align: center;
+  color: #888;
+  padding: 10px 0;
+}
