@@ -13,8 +13,8 @@
 
 # 🌟 모듈 설치
 - frontend/backend 폴더 밑에서 각각 실행
- - `web-todo/frontend > npm install`
- - `web-todo/backend > npm install`
+    - `web-todo/frontend > npm install`
+    - `web-todo/backend > npm install`
 
 ---
 
@@ -25,17 +25,17 @@
 - 코드 작성 예시
 
     ```
-PORT = 5000
-DB_USER = your_database_username
-DB_PASSWORD = your_database_password
-PRIVATE_KEY = your_jwt_secret_key
-```
+    PORT = 5000
+    DB_USER = your_database_username
+    DB_PASSWORD = your_database_password
+    PRIVATE_KEY = your_jwt_secret_key
+    ```
 --- 
 
 # 🚀 START
 - FE와 BE를 따로 구동합니다.
- - `web-todo/frontend > npm start`
- - `web-todo/backend > node app.js`
+    - `web-todo/frontend > npm start`
+    - `web-todo/backend > node app.js`
 ---
 
 # 🍀 FE
@@ -56,13 +56,13 @@ PRIVATE_KEY = your_jwt_secret_key
    
 ## 💡 추후 개선 방향
 - ### 구동 방식 개선
- - FE와 BE를 합쳐서 구동할 수 있도록 하겠습니다.
+    - FE와 BE를 합쳐서 구동할 수 있도록 하겠습니다.
 
 - ### Docker를 이용한 DB세팅 및 배포
- - 로컬에서만 작업이 이루어져 FE와 BE가 각자 DB를 관리해야 하는 점이 아쉬웠습니다. 추후 Docker를 이용해 고도화 해보겠습니다.
+    - 로컬에서만 작업이 이루어져 FE와 BE가 각자 DB를 관리해야 하는 점이 아쉬웠습니다. 추후 Docker를 이용해 고도화 해보겠습니다.
 
 - ### JWT 토큰 사용
- - 현재 userId 를 FE에서 넘겨준 뒤 데이터 처리를 하고 있습니다. 토큰을 이용해 HEADER에서 데이터를 받아올 수 있도록 개선할 예정입니다.
+    - 현재 userId 를 FE에서 넘겨준 뒤 데이터 처리를 하고 있습니다. 토큰을 이용해 HEADER에서 데이터를 받아올 수 있도록 개선할 예정입니다.
 
- - 현재 세션을 관리하지 않아, 새로고침하면 무조건 로그인 화면으로 돌아가고 있습니다. 세션이 남아있으면 ToDo 페이지에 머물도록 개선할 예정입니다.
+    - 현재 세션을 관리하지 않아, 새로고침하면 무조건 로그인 화면으로 돌아가고 있습니다. 세션이 남아있으면 ToDo 페이지에 머물도록 개선할 예정입니다.
 
