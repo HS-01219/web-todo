@@ -15,7 +15,7 @@ const createWork = async (name, userId, teamId) => {
     }
 };
 
-const getWorks = async (userId, teamId, state) => {
+const getWorks = async (userId, teamId) => {
     let sql = `SELECT * FROM works`;
     let values = [];
     if (userId) {

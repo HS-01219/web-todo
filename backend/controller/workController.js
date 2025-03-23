@@ -14,10 +14,10 @@ const createWork = async (req, res) => {
 }
 
 const getWorks = async (req, res) => {
-    const { userId, teamId, state } = req.query;
+    const { userId, teamId } = req.query;
 
     try {
-        const results = await workService.getWorks(userId, teamId, state);
+        const results = await workService.getWorks(userId, teamId);
         return res.status(StatusCodes.OK).json(results);
     } catch (err) {
         console.log(err);
